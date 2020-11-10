@@ -12,7 +12,7 @@ import (
 
 type serverResponse struct {
 	statusCode uint16
-	body interface{}
+	body       interface{}
 }
 
 func (s *serverResponse) Error() string {
@@ -29,7 +29,7 @@ func (s *serverResponse) SetBody(body interface{}) {
 
 type handler struct {
 	requestHandler RequestHandler
-	logger log.Logger
+	logger         log.Logger
 }
 
 var internalErrorResponse = serverResponse{
@@ -45,12 +45,12 @@ var badRequestResponse = serverResponse{
 func (h *handler) ServeHTTP(goWriter goHttp.ResponseWriter, goRequest *goHttp.Request) {
 	response := serverResponse{
 		statusCode: 200,
-		body: nil,
+		body:       nil,
 	}
 	if err := h.requestHandler.OnRequest(
 		&internalRequest{
 			request: goRequest,
-			writer: goWriter,
+			writer:  goWriter,
 		},
 		&response,
 	); err != nil {
@@ -85,4 +85,3 @@ func (i *internalRequest) Decode(target interface{}) error {
 	}
 	return json.Unmarshal(bytes, target)
 }
-

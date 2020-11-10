@@ -12,6 +12,6 @@ func NewServerHandler(
 ) goHttp.Handler {
 	return &handler{
 		requestHandler: requestHandler,
-		logger: logger,
+		logger:         logger,
 	}
 }

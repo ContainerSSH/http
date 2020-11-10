@@ -60,4 +60,3 @@ func (c *client) request(
 	}
 	return resp.StatusCode, nil
 }
-

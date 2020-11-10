@@ -11,6 +11,7 @@ import (
 	"github.com/containerssh/log"
 )
 
+// NewServer creates a new HTTP server with the given configuration and calling the provided handler.
 func NewServer(
 	config ServerConfiguration,
 	handler goHttp.Handler,

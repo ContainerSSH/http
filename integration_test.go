@@ -17,7 +17,7 @@ type Request struct {
 }
 
 type Response struct {
-	Error bool `json:"error"`
+	Error   bool   `json:"error"`
 	Message string `json:"message"`
 }
 
@@ -46,8 +46,8 @@ func (s *handler) OnRequest(request http.ServerRequest, response http.ServerResp
 func TestUnencrypted(t *testing.T) {
 	logger := standard.New()
 	clientConfig := http.ClientConfiguration{
-		Url:        "http://127.0.0.1:8080/",
-		Timeout:    2 * time.Second,
+		Url:     "http://127.0.0.1:8080/",
+		Timeout: 2 * time.Second,
 	}
 
 	client, err := http.NewClient(clientConfig, logger)
@@ -58,7 +58,7 @@ func TestUnencrypted(t *testing.T) {
 
 	server, err := http.NewServer(
 		http.ServerConfiguration{
-			Listen:       "127.0.0.1:8080",
+			Listen: "127.0.0.1:8080",
 		},
 		http.NewServerHandler(&handler{}, logger),
 		logger,

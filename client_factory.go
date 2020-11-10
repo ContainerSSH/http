@@ -11,6 +11,7 @@ import (
 	"github.com/containerssh/log"
 )
 
+// NewClient creates a new HTTP client with the given configuration.
 func NewClient(
 	config ClientConfiguration,
 	logger log.Logger,

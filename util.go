@@ -11,4 +11,3 @@ func loadPem(spec string) ([]byte, error) {
 	}
 	return []byte(spec), nil
 }
-
