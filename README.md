@@ -24,7 +24,10 @@ logger := standard.New()
 clientConfig := http.ClientConfiguration{
     Url:        "http://127.0.0.1:8080/",
     Timeout:    2 * time.Second,
-    // You can add TLS configuration here
+    // You can add TLS configuration here:
+    CaCert: "Add expected CA certificate(s) here. This is required for HTTPS servers on Windows due to golang##16736",
+    ClientCert: "Client certificate in PEM format or file name",
+    ClientKey: "Client key in PEM format or file name",
 }
 client, err := http.NewClient(clientConfig, logger)
 if err != nil {
@@ -35,7 +38,12 @@ request := yourRequestStruct{}
 response := yourResponseStruct{}
 responseStatus := uint16(0)
 
-if err := client.Post("/relative/path/from/base/url", &request, &responseStatus, &response); err != nil {
+if err := client.Post(
+    "/relative/path/from/base/url",
+    &request,
+    &responseStatus,
+    &response,
+); err != nil {
     // Handle connection error
 }
 
@@ -54,9 +62,18 @@ The server consist of two parts: the HTTP server and the handler. The HTTP serve
 server, err := http.NewServer(
     http.ServerConfiguration{
         Listen:       "127.0.0.1:8080",
-        // You can also add TLS configuration and certificates here
+        // You can also add TLS configuration
+        // and certificates here:
+        Key: "PEM-encoded key or file name to cert here.",
+		Cert: "PEM-encoded certificate chain or file name here",
+        // Authenticate clients with certificates:
+		ClientCaCert: "PEM-encoded client CA certificate or file name here",
     },
     handler,
+    func() {
+        // This function will be called when the server is ready to serve
+        // requests. 
+    },
     logger,
 )
 if err != nil {
