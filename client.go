@@ -9,7 +9,7 @@ import (
 type Client interface {
 	// Post queries the configured endpoint with the path, sending the requestBody and providing the
 	// response in the responseBody structure. It returns the HTTP status code and any potential errors.
-	Post(path string, requestBody interface{}, responseBody interface{}) (int, error)
+	Post(path string, requestBody interface{}, responseBody interface{}) (statusCode int, err error)
 }
 
 // ClientConfiguration is the configuration structure for HTTP clients

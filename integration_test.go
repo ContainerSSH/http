@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"math/big"
 	"net"
-	"sync"
 	"testing"
 	"time"
 
@@ -262,11 +261,11 @@ func createCA() (*rsa.PrivateKey, *x509.Certificate, []byte, error) {
 	}
 	caPrivateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to create private key (%v)", err)
+		return nil, nil, nil, fmt.Errorf("failed to create private key (%w)", err)
 	}
 	caCert, err := x509.CreateCertificate(rand.Reader, ca, ca, &caPrivateKey.PublicKey, caPrivateKey)
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to create CA certificate (%v)", err)
+		return nil, nil, nil, fmt.Errorf("failed to create CA certificate (%w)", err)
 	}
 	caPEM := new(bytes.Buffer)
 	if err := pem.Encode(
@@ -276,7 +275,7 @@ func createCA() (*rsa.PrivateKey, *x509.Certificate, []byte, error) {
 			Bytes: caCert,
 		},
 	); err != nil {
-		return nil, nil, nil, fmt.Errorf("failed to encode CA cert (%v)", err)
+		return nil, nil, nil, fmt.Errorf("failed to encode CA cert (%w)", err)
 	}
 	return caPrivateKey, ca, caPEM.Bytes(), nil
 }
@@ -355,42 +354,24 @@ func runRequest(
 	}
 
 	errorChannel := make(chan error, 2)
-	clientDone := make(chan bool, 1)
 	responseStatus := 0
-	wg := &sync.WaitGroup{}
-	wg.Add(2)
 	go func() {
-		defer wg.Done()
 		if err := server.Run(); err != nil {
 			errorChannel <- err
 		}
+		close(errorChannel)
 	}()
 	<-ready
-	go func() {
-		defer wg.Done()
-		if responseStatus, err = client.Post(
-			"",
-			&Request{Message: message},
-			&response,
-		); err != nil {
-			errorChannel <- err
-		}
-		clientDone <- true
-	}()
-	<-clientDone
+	if responseStatus, err = client.Post(
+		"",
+		&Request{Message: message},
+		&response,
+	); err != nil {
+		errorChannel <- err
+	}
 	server.Shutdown(context.Background())
-	wg.Wait()
-	finished := false
-	for {
-		select {
-		case err := <-errorChannel:
-			return response, 0, err
-		default:
-			finished = true
-		}
-		if finished {
-			break
-		}
+	if err, ok := <-errorChannel; ok {
+		return response, 0, err
 	}
 	return response, responseStatus, nil
 }

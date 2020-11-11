@@ -3,6 +3,7 @@ package http
 import (
 	"context"
 	"crypto/tls"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -56,7 +57,7 @@ func (s *server) Run() error {
 	} else {
 		err = s.srv.Serve(ln)
 	}
-	if err != nil && err != goHttp.ErrServerClosed {
+	if err != nil && !errors.Is(err, goHttp.ErrServerClosed) {
 		return err
 	}
 	return nil

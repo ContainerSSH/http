@@ -52,6 +52,7 @@ func (c *client) request(
 	if err != nil {
 		return 0, err
 	}
+	defer func() { _ = resp.Body.Close() }()
 
 	decoder := json.NewDecoder(resp.Body)
 	decoder.DisallowUnknownFields()
