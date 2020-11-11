@@ -25,7 +25,8 @@ clientConfig := http.ClientConfiguration{
     Url:        "http://127.0.0.1:8080/",
     Timeout:    2 * time.Second,
     // You can add TLS configuration here:
-    CaCert:     "Add expected CA certificate(s) here. This is required for HTTPS servers on Windows due to golang##16736",
+    CaCert:     "Add expected CA certificate(s) here.",
+                // CaCert is is required for https:// URLs on Windows due to golang#16736
     ClientCert: "Client certificate in PEM format or file name",
     ClientKey:  "Client key in PEM format or file name",
 }
