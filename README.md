@@ -65,9 +65,9 @@ server, err := http.NewServer(
         // You can also add TLS configuration
         // and certificates here:
         Key: "PEM-encoded key or file name to cert here.",
-		Cert: "PEM-encoded certificate chain or file name here",
+        Cert: "PEM-encoded certificate chain or file name here",
         // Authenticate clients with certificates:
-		ClientCaCert: "PEM-encoded client CA certificate or file name here",
+        ClientCaCert: "PEM-encoded client CA certificate or file name here",
     },
     handler,
     func() {
