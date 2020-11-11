@@ -16,12 +16,14 @@ func NewClient(
 	config ClientConfiguration,
 	logger log.Logger,
 ) (Client, error) {
-	tlsConfig, err := createTlsConfig(config, logger)
+	tlsConfig, err := createTLSConfig(config, logger)
 	if err != nil {
 		return nil, err
 	}
 
-	transport := &http.Transport{TLSClientConfig: tlsConfig}
+	transport := &http.Transport{
+		TLSClientConfig: tlsConfig,
+	}
 
 	httpClient := &http.Client{
 		Transport: transport,
@@ -36,7 +38,7 @@ func NewClient(
 	}, nil
 }
 
-func createTlsConfig(config ClientConfiguration, logger log.Logger) (*tls.Config, error) {
+func createTLSConfig(config ClientConfiguration, logger log.Logger) (*tls.Config, error) {
 	if logger == nil {
 		return nil, fmt.Errorf("no logger provided")
 	}
@@ -45,7 +47,21 @@ func createTlsConfig(config ClientConfiguration, logger log.Logger) (*tls.Config
 		return nil, fmt.Errorf("no URL provided")
 	}
 
-	tlsConfig := &tls.Config{}
+	if !strings.HasPrefix(config.Url, "https://") {
+		return nil, nil
+	}
+
+	tlsConfig := &tls.Config{
+		MinVersion:       tls.VersionTLS13,
+		CurvePreferences: []tls.CurveID{tls.X25519, tls.CurveP521, tls.CurveP384, tls.CurveP256},
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_AES_128_GCM_SHA256,
+			tls.TLS_AES_256_GCM_SHA384,
+			tls.TLS_CHACHA20_POLY1305_SHA256,
+		},
+	}
 	if strings.TrimSpace(config.CaCert) != "" {
 		caCert, err := loadPem(config.CaCert)
 		if err != nil {
@@ -72,9 +88,9 @@ func createTlsConfig(config ClientConfiguration, logger log.Logger) (*tls.Config
 		if err != nil {
 			return nil, fmt.Errorf("failed to load client certificate (%w)", err)
 		}
-		cert, err := tls.LoadX509KeyPair(string(clientCert), string(clientKey))
+		cert, err := tls.X509KeyPair(clientCert, clientKey)
 		if err != nil {
-			logger.Criticale(err)
+			return nil, fmt.Errorf("failed to load certificate or key (%w)", err)
 		}
 		tlsConfig.Certificates = []tls.Certificate{cert}
 	}
