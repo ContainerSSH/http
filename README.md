@@ -72,7 +72,7 @@ server, err := http.NewServer(
     handler,
     func() {
         // This function will be called when the server is ready to serve
-        // requests. 
+        // requests. You can pass nil if you don't need it.
     },
     logger,
 )
