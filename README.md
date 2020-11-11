@@ -27,6 +27,7 @@ clientConfig := http.ClientConfiguration{
     // You can add TLS configuration here:
     CaCert:     "Add expected CA certificate(s) here.",
                 // CaCert is is required for https:// URLs on Windows due to golang#16736
+    // Optionally, for client authentication:
     ClientCert: "Client certificate in PEM format or file name",
     ClientKey:  "Client key in PEM format or file name",
 }
