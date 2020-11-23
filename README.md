@@ -62,6 +62,7 @@ The server consist of two parts: the HTTP server and the handler. The HTTP serve
 
 ```go
 server, err := http.NewServer(
+    "service name",
     http.ServerConfiguration{
         Listen:       "127.0.0.1:8080",
         // You can also add TLS configuration
@@ -72,23 +73,21 @@ server, err := http.NewServer(
         ClientCaCert: "PEM-encoded client CA certificate or file name here",
     },
     handler,
-    func() {
-        // This function will be called when the server is ready to serve
-        // requests. You can pass nil if you don't need it.
-    },
     logger,
 )
 if err != nil {
     // Handle configuration error
 }
+// Lifecycle from the github.com/containerssh/service package
+lifecycle := service.NewLifecycle(server)
 go func() {
-    if err := server.Run(); err != nil {
+    if err := lifecycle.Run(); err != nil {
         // Handle error
     }
 }()
 // Do something else, then shut down the server.
 // You can pass a context for the shutdown deadline.
-server.Shutdown(context.Background())
+lifecycle.Shutdown(context.Background())
 ```
 
 Like before, the `logger` parameter is a logger from the [github.com/containerssh/log](https://github.com/containerssh/log) package. The `handler` is a regular [go HTTP handler](https://golang.org/pkg/net/http/#Handler) that satisfies this interface:
@@ -98,6 +97,8 @@ type Handler interface {
     ServeHTTP(http.ResponseWriter, *http.Request)
 }
 ```
+
+The lifecycle object is one from the [ContainerSSH service package](https://github.com/containerssh/service).
 
 ## Using a simplified handler
 

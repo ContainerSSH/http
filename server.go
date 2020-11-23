@@ -1,7 +1,7 @@
 package http
 
 import (
-	"context"
+	"github.com/containerssh/service"
 )
 
 // ServerConfiguration is a structure to configure the simple HTTP server by.
@@ -19,6 +19,5 @@ type ServerConfiguration struct {
 
 // Server is an interface that specifies the minimum requirements for the server.
 type Server interface {
-	Run() error
-	Shutdown(shutdownContext context.Context)
+	service.Service
 }

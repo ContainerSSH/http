@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/containerssh/log/standard"
+	"github.com/containerssh/service"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/containerssh/http"
@@ -342,21 +343,23 @@ func runRequest(
 
 	ready := make(chan bool, 1)
 	server, err := http.NewServer(
+		"HTTP",
 		serverConfig,
 		http.NewServerHandler(&handler{}, logger),
-		func() {
-			ready <- true
-		},
 		logger,
 	)
 	if err != nil {
 		return response, 0, err
 	}
+	lifecycle := service.NewLifecycle(server)
+	lifecycle.OnRunning(func(s service.Service, l service.Lifecycle) {
+		ready <- true
+	})
 
 	errorChannel := make(chan error, 2)
 	responseStatus := 0
 	go func() {
-		if err := server.Run(); err != nil {
+		if err := lifecycle.Run(); err != nil {
 			errorChannel <- err
 		}
 		close(errorChannel)
@@ -369,7 +372,7 @@ func runRequest(
 	); err != nil {
 		errorChannel <- err
 	}
-	server.Shutdown(context.Background())
+	lifecycle.Stop(context.Background())
 	if err, ok := <-errorChannel; ok {
 		return response, 0, err
 	}

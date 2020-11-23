@@ -12,9 +12,9 @@ import (
 
 // NewServer creates a new HTTP server with the given configuration and calling the provided handler.
 func NewServer(
+	name string,
 	config ServerConfiguration,
 	handler goHttp.Handler,
-	onReady func(),
 	logger log.Logger,
 ) (Server, error) {
 	if handler == nil {
@@ -41,14 +41,13 @@ func NewServer(
 	}
 
 	return &server{
+		name:      name,
 		lock:      &sync.Mutex{},
 		handler:   handler,
 		config:    config,
 		tlsConfig: tlsConfig,
 		srv:       nil,
-		done:      make(chan bool, 1),
 		goLogger:  log.NewGoLogWriter(logger),
-		onReady:   onReady,
 	}, nil
 }
 
