@@ -43,11 +43,11 @@ func createTLSConfig(config ClientConfiguration, logger log.Logger) (*tls.Config
 		return nil, fmt.Errorf("no logger provided")
 	}
 
-	if config.Url == "" {
+	if config.URL == "" {
 		return nil, fmt.Errorf("no URL provided")
 	}
 
-	if !strings.HasPrefix(config.Url, "https://") {
+	if !strings.HasPrefix(config.URL, "https://") {
 		return nil, nil
 	}
 
@@ -71,7 +71,7 @@ func createTLSConfig(config ClientConfiguration, logger log.Logger) (*tls.Config
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
 		tlsConfig.RootCAs = caCertPool
-	} else if runtime.GOOS == "windows" && strings.HasPrefix(config.Url, "https://") {
+	} else if runtime.GOOS == "windows" && strings.HasPrefix(config.URL, "https://") {
 		//Remove if https://github.com/golang/go/issues/16736 gets fixed
 		return nil, fmt.Errorf(
 			"due to a bug (#16736) in Golang on Windows CA certificates have to be explicitly " +

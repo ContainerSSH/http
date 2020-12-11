@@ -15,8 +15,8 @@ type Client interface {
 // ClientConfiguration is the configuration structure for HTTP clients
 type ClientConfiguration struct {
 	// URL is the base URL for requests.
-	Url string `json:"url" yaml:"url" comment:"Base URL of the server to connect."`
-	// CaCerts is either the CA certificate to expect on the server in PEM format
+	URL string `json:"url" yaml:"url" comment:"Base URL of the server to connect."`
+	// CaCert is either the CA certificate to expect on the server in PEM format
 	//         or the name of a file containing the PEM.
 	CaCert string `json:"cacert" yaml:"cacert" comment:"CA certificate in PEM format to use for host verification. Note: due to a bug in Go on Windows this has to be explicitly provided."`
 	// Timeout is the time the client should wait for a response.

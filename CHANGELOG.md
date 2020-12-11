@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.2: URL instead or Url
+
+This release changes the `Url` variable for the client to `URL`. It also bumps the [log dependency](https://github.com/containerssh/log) to the latest release.
+
 ## 0.9.1: Service Integration (November 23, 2020)
 
 This release changes the API of the HTTP server to integrate with the [Service library](https://github.com/containerssh/service). The public interface now requires using the `Lifecycle` object to start and stop the server. The `Lifecycle` also allows adding hooks for lifecycle events.
