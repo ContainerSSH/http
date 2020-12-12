@@ -22,7 +22,7 @@ The client library takes a request object that [can be marshalled into JSON form
 // Logger is from the github.com/containerssh/log package
 logger := standard.New()
 clientConfig := http.ClientConfiguration{
-    Url:        "http://127.0.0.1:8080/",
+    URL:        "http://127.0.0.1:8080/",
     Timeout:    2 * time.Second,
     // You can add TLS configuration here:
     CaCert:     "Add expected CA certificate(s) here.",

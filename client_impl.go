@@ -40,7 +40,7 @@ func (c *client) request(
 	}
 	req, err := http.NewRequest(
 		method,
-		fmt.Sprintf("%s%s", c.config.Url, path),
+		fmt.Sprintf("%s%s", c.config.URL, path),
 		buffer,
 	)
 	if err != nil {

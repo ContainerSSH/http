@@ -11,10 +11,11 @@ import (
 	"fmt"
 	"math/big"
 	"net"
+	"os"
 	"testing"
 	"time"
 
-	"github.com/containerssh/log/standard"
+	"github.com/containerssh/log"
 	"github.com/containerssh/service"
 	"github.com/stretchr/testify/assert"
 
@@ -55,7 +56,7 @@ func (s *handler) OnRequest(request http.ServerRequest, response http.ServerResp
 
 func TestUnencrypted(t *testing.T) {
 	clientConfig := http.ClientConfiguration{
-		Url:     "http://127.0.0.1:8080/",
+		URL:     "http://127.0.0.1:8080/",
 		Timeout: 2 * time.Second,
 	}
 	serverConfig := http.ServerConfiguration{
@@ -76,7 +77,7 @@ func TestUnencrypted(t *testing.T) {
 
 func TestUnencryptedFailure(t *testing.T) {
 	clientConfig := http.ClientConfiguration{
-		Url:     "http://127.0.0.1:8080/",
+		URL:     "http://127.0.0.1:8080/",
 		Timeout: 2 * time.Second,
 	}
 	serverConfig := http.ServerConfiguration{
@@ -112,7 +113,7 @@ func TestEncrypted(t *testing.T) {
 	}
 
 	clientConfig := http.ClientConfiguration{
-		Url:     "https://127.0.0.1:8080/",
+		URL:     "https://127.0.0.1:8080/",
 		Timeout: 2 * time.Second,
 		CaCert:  string(caCertBytes),
 	}
@@ -166,7 +167,7 @@ func TestMutuallyAuthenticated(t *testing.T) {
 	}
 
 	clientConfig := http.ClientConfiguration{
-		Url:        "https://127.0.0.1:8080/",
+		URL:        "https://127.0.0.1:8080/",
 		CaCert:     string(caCertBytes),
 		Timeout:    2 * time.Second,
 		ClientCert: string(clientCert),
@@ -223,7 +224,7 @@ func TestMutuallyAuthenticatedFailure(t *testing.T) {
 	}
 
 	clientConfig := http.ClientConfiguration{
-		Url:        "https://127.0.0.1:8080/",
+		URL:        "https://127.0.0.1:8080/",
 		CaCert:     string(caCertBytes),
 		Timeout:    2 * time.Second,
 		ClientCert: string(clientCert),
@@ -334,8 +335,18 @@ func runRequest(
 	serverConfig http.ServerConfiguration,
 	message string,
 ) (Response, int, error) {
-	logger := standard.New()
 	response := Response{}
+	logger, err := log.New(
+		log.Config{
+			Level:  log.LevelDebug,
+			Format: log.FormatText,
+		},
+		"http",
+		os.Stdout,
+	)
+	if err != nil {
+		return response, 0, err
+	}
 	client, err := http.NewClient(clientConfig, logger)
 	if err != nil {
 		return response, 0, err
