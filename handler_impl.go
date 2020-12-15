@@ -73,7 +73,7 @@ func (h *handler) ServeHTTP(goWriter goHttp.ResponseWriter, goRequest *goHttp.Re
 	goWriter.WriteHeader(int(response.statusCode))
 	goWriter.Header().Add("Content-Type", "application/json")
 	if _, err := goWriter.Write(bytes); err != nil {
-		h.logger.Infof("failed to write HTTP response")
+		h.logger.Infof("failed to write HTTP response (%v)", err)
 	}
 }
 
