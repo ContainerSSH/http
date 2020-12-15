@@ -38,15 +38,21 @@ if err != nil {
 
 request := yourRequestStruct{}
 response := yourResponseStruct{}
-responseStatus := uint16(0)
 
-if err := client.Post(
+responseStatus, err := client.Post(
+    context.TODO(),
     "/relative/path/from/base/url",
     &request,
-    &responseStatus,
     &response,
-); err != nil {
+)
+if err != nil {
     // Handle connection error
+    clientError := &http.ClientError{}
+    if errors.As(err, clientError) {
+        // Grab additional information here
+    } else {
+    	// This should never happen
+    }
 }
 
 if responseStatus > 399 {

@@ -1,6 +1,8 @@
 package http
 
 import (
+	"context"
+	"fmt"
 	"time"
 )
 
@@ -9,7 +11,14 @@ import (
 type Client interface {
 	// Post queries the configured endpoint with the path, sending the requestBody and providing the
 	// response in the responseBody structure. It returns the HTTP status code and any potential errors.
-	Post(path string, requestBody interface{}, responseBody interface{}) (statusCode int, err error)
+	//
+	// The returned error is always one of ClientError
+	Post(
+		ctx context.Context,
+		path string,
+		requestBody interface{},
+		responseBody interface{},
+	) (statusCode int, err error)
 }
 
 // ClientConfiguration is the configuration structure for HTTP clients
@@ -25,4 +34,42 @@ type ClientConfiguration struct {
 	ClientCert string `json:"cert" yaml:"cert" comment:"Client certificate file in PEM format."`
 	// ClientKey is a PEM containing a private key to use to connect the server or a file name containing the PEM.
 	ClientKey string `json:"key" yaml:"key" comment:"Client key file in PEM format."`
+}
+
+// FailureReason describes the Reason why the request failed.
+type FailureReason string
+
+const (
+	// FailureReasonEncodeFailed indicates that JSON encoding the request failed. This is usually a bug.
+	FailureReasonEncodeFailed FailureReason = "encode_failed"
+	// FailureReasonConnectionFailed indicates a connection failure.
+	FailureReasonConnectionFailed FailureReason = "connection_failed"
+	// FailureReasonDecodeFailed indicates that decoding the JSON response has failed. The status code is set for this
+	// code.
+	FailureReasonDecodeFailed FailureReason = "decode_failed"
+)
+
+// ClientError is the the description of the failure of the client request.
+type ClientError struct {
+	// Reason is one of FailureReason describing the cause of the failure.
+	Reason FailureReason `json:"reason" yaml:"reason"`
+	// Cause is the original error that is responsible for the error
+	Cause error `json:"cause" yaml:"cause"`
+	// Message is the message that can be printed into a log.
+	Message string `json:"message" yaml:"message"`
+}
+
+// Unwrap returns the original error.
+func (c ClientError) Unwrap() error {
+	return c.Cause
+}
+
+// Error returns the error string.
+func (c ClientError) Error() string {
+	return c.Message
+}
+
+// String returns a printable string
+func (c ClientError) String() string {
+	return fmt.Sprintf("%s: %s (%v)", c.Reason, c.Message, c.Cause)
 }
