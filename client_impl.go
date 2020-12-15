@@ -2,7 +2,6 @@ package http
 
 import (
 	"bytes"
-	"context"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -19,7 +18,6 @@ type client struct {
 }
 
 func (c *client) Post(
-	ctx context.Context,
 	path string,
 	requestBody interface{},
 	responseBody interface{},
@@ -28,7 +26,6 @@ func (c *client) Post(
 	error,
 ) {
 	return c.request(
-		ctx,
 		http.MethodPost,
 		path,
 		requestBody,
@@ -37,7 +34,6 @@ func (c *client) Post(
 }
 
 func (c *client) request(
-	ctx context.Context,
 	method string,
 	path string,
 	requestBody interface{},
@@ -53,8 +49,7 @@ func (c *client) request(
 			Message: "failed to encode request body",
 		}
 	}
-	req, err := http.NewRequestWithContext(
-		ctx,
+	req, err := http.NewRequest(
 		method,
 		fmt.Sprintf("%s%s", c.config.URL, path),
 		buffer,
