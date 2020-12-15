@@ -23,12 +23,12 @@ import (
 )
 
 type Request struct {
-	Message string `json:"message"`
+	Message string `json:"Message"`
 }
 
 type Response struct {
 	Error   bool   `json:"error"`
-	Message string `json:"message"`
+	Message string `json:"Message"`
 }
 
 type handler struct {
@@ -377,6 +377,7 @@ func runRequest(
 	}()
 	<-ready
 	if responseStatus, err = client.Post(
+		context.Background(),
 		"",
 		&Request{Message: message},
 		&response,

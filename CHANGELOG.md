@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.9.3: Context handling, better errors
+
+This release includes two changes:
+
+1. The `Post()` method now accepts a context variable as its first parameter for timeout handling.
+2. The `Post()` method now exclusively returns a `http.ClientError`, which includes the reason for failure.
+
 ## 0.9.2: URL instead or Url
 
 This release changes the `Url` variable for the client to `URL`. It also bumps the [log dependency](https://github.com/containerssh/log) to the latest release.
