@@ -1,7 +1,6 @@
 package http
 
 import (
-	"context"
 	"fmt"
 	"time"
 )
@@ -14,7 +13,6 @@ type Client interface {
 	//
 	// The returned error is always one of ClientError
 	Post(
-		ctx context.Context,
 		path string,
 		requestBody interface{},
 		responseBody interface{},

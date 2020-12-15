@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.4: Rolled back context handling
+
+This release removes the previously erroneously added context handling.
+
 ## 0.9.3: Context handling, better errors
 
 This release includes two changes:

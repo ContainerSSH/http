@@ -377,7 +377,6 @@ func runRequest(
 	}()
 	<-ready
 	if responseStatus, err = client.Post(
-		context.Background(),
 		"",
 		&Request{Message: message},
 		&response,
