@@ -76,7 +76,7 @@ server, err := http.NewServer(
         Key:          "PEM-encoded key or file name to cert here.",
         Cert:         "PEM-encoded certificate chain or file name here",
         // Authenticate clients with certificates:
-        ClientCaCert: "PEM-encoded client CA certificate or file name here",
+        ClientCACert: "PEM-encoded client CA certificate or file name here",
     },
     handler,
     logger,

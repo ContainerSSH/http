@@ -2,8 +2,6 @@ package http
 
 import (
 	"crypto/tls"
-	"crypto/x509"
-	"fmt"
 	goHttp "net/http"
 	"sync"
 
@@ -18,25 +16,22 @@ func NewServer(
 	logger log.Logger,
 ) (Server, error) {
 	if handler == nil {
-		return nil, fmt.Errorf("handler cannot be nil")
+		panic("BUG: no handler provided to http.NewServer")
+	}
+	if logger == nil {
+		panic("BUG: no logger provided to http.NewServer")
+	}
+
+	if err := config.Validate(); err != nil {
+		return nil, err
 	}
 
 	var tlsConfig *tls.Config
-	if config.Cert != "" && config.Key != "" {
+	if config.cert != nil {
 		var err error
-		tlsConfig, err = createServerTlsConfig(config)
+		tlsConfig, err = createServerTLSConfig(config)
 		if err != nil {
 			return nil, err
-		}
-	} else {
-		if config.Cert != "" {
-			return nil, fmt.Errorf("server certificate provided, but no private key")
-		}
-		if config.Key != "" {
-			return nil, fmt.Errorf("server privaet key provided, but no certificate")
-		}
-		if config.ClientCaCert != "" {
-			return nil, fmt.Errorf("client CA certificate is set, but no server certificate or private key provided")
 		}
 	}
 
@@ -51,7 +46,7 @@ func NewServer(
 	}, nil
 }
 
-func createServerTlsConfig(config ServerConfiguration) (*tls.Config, error) {
+func createServerTLSConfig(config ServerConfiguration) (*tls.Config, error) {
 	tlsConfig := &tls.Config{
 		MinVersion:               tls.VersionTLS13,
 		CurvePreferences:         []tls.CurveID{tls.X25519, tls.CurveP521, tls.CurveP384, tls.CurveP256},
@@ -65,29 +60,10 @@ func createServerTlsConfig(config ServerConfiguration) (*tls.Config, error) {
 		},
 	}
 
-	clientCert, err := loadPem(config.Cert)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load client certificate (%w)", err)
-	}
-	clientKey, err := loadPem(config.Key)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load client certificate (%w)", err)
-	}
-	cert, err := tls.X509KeyPair(clientCert, clientKey)
-	if err != nil {
-		return nil, fmt.Errorf("failed to load certificate or key (%w)", err)
-	}
-	tlsConfig.Certificates = []tls.Certificate{cert}
+	tlsConfig.Certificates = []tls.Certificate{*config.cert}
 
-	if config.ClientCaCert != "" {
-		clientCaCert, err := loadPem(config.ClientCaCert)
-		if err != nil {
-			return nil, fmt.Errorf("failed to load CA certificate (%w)", err)
-		}
-
-		caCertPool := x509.NewCertPool()
-		caCertPool.AppendCertsFromPEM(clientCaCert)
-		tlsConfig.ClientCAs = caCertPool
+	if config.clientCAPool != nil {
+		tlsConfig.ClientCAs = config.clientCAPool
 		tlsConfig.ClientAuth = tls.RequireAndVerifyClientCert
 	}
 	return tlsConfig, nil

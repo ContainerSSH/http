@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.5: Added config validation
+
+This release adds a `Validate()` method to both the client and the server configuration. This will allow for a central validation of the entire configuration structure.
+
 ## 0.9.4: Rolled back context handling
 
 This release removes the previously erroneously added context handling.

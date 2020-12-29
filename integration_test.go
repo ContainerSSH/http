@@ -115,7 +115,7 @@ func TestEncrypted(t *testing.T) {
 	clientConfig := http.ClientConfiguration{
 		URL:     "https://127.0.0.1:8080/",
 		Timeout: 2 * time.Second,
-		CaCert:  string(caCertBytes),
+		CACert:  string(caCertBytes),
 	}
 	serverConfig := http.ServerConfiguration{
 		Listen: "127.0.0.1:8080",
@@ -168,7 +168,7 @@ func TestMutuallyAuthenticated(t *testing.T) {
 
 	clientConfig := http.ClientConfiguration{
 		URL:        "https://127.0.0.1:8080/",
-		CaCert:     string(caCertBytes),
+		CACert:     string(caCertBytes),
 		Timeout:    2 * time.Second,
 		ClientCert: string(clientCert),
 		ClientKey:  string(clientPrivKey),
@@ -177,7 +177,7 @@ func TestMutuallyAuthenticated(t *testing.T) {
 		Listen:       "127.0.0.1:8080",
 		Key:          string(serverPrivKey),
 		Cert:         string(serverCert),
-		ClientCaCert: string(clientCaCertBytes),
+		ClientCACert: string(clientCaCertBytes),
 	}
 
 	message := "Hi"
@@ -225,7 +225,7 @@ func TestMutuallyAuthenticatedFailure(t *testing.T) {
 
 	clientConfig := http.ClientConfiguration{
 		URL:        "https://127.0.0.1:8080/",
-		CaCert:     string(caCertBytes),
+		CACert:     string(caCertBytes),
 		Timeout:    2 * time.Second,
 		ClientCert: string(clientCert),
 		ClientKey:  string(clientPrivKey),
@@ -235,7 +235,7 @@ func TestMutuallyAuthenticatedFailure(t *testing.T) {
 		Key:    string(serverPrivKey),
 		Cert:   string(serverCert),
 		//Pass wrong client CA cert to test failure
-		ClientCaCert: string(caCertBytes),
+		ClientCACert: string(caCertBytes),
 	}
 
 	message := "Hi"

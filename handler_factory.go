@@ -11,6 +11,12 @@ func NewServerHandler(
 	requestHandler RequestHandler,
 	logger log.Logger,
 ) goHttp.Handler {
+	if requestHandler == nil {
+		panic("BUG: no requestHandler provided to http.NewServerHandler")
+	}
+	if logger == nil {
+		panic("BUG: no logger provided to http.NewServerHandler")
+	}
 	return &handler{
 		requestHandler: requestHandler,
 		logger:         logger,
