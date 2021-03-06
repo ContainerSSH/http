@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.7: Bugfixing validation
+
+This release fixes a validation bug introduced in the previous version where TLS parameters were validated even if the URL didn't point to a `https://` URL.
+
 ## 0.9.6: Configurable TLS support, unified logging
 
 This release adds configurable TLS versions, ciphers, ECDH curves, as well as transitioning to the unified logging interface. 

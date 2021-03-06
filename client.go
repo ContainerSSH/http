@@ -346,14 +346,16 @@ func (c *ClientConfiguration) Validate() error {
 		return err
 	}
 
-	if err := c.TLSVersion.Validate(); err != nil {
-		return fmt.Errorf("invalid TLS version (%w)", err)
-	}
-	if err := c.ECDHCurves.Validate(); err != nil {
-		return fmt.Errorf("invalid curve algorithms (%w)", err)
-	}
-	if err := c.CipherSuites.Validate(); err != nil {
-		return fmt.Errorf("invalid cipher suites (%w)", err)
+	if strings.HasPrefix(c.URL, "https://") {
+		if err := c.TLSVersion.Validate(); err != nil {
+			return fmt.Errorf("invalid TLS version (%w)", err)
+		}
+		if err := c.ECDHCurves.Validate(); err != nil {
+			return fmt.Errorf("invalid curve algorithms (%w)", err)
+		}
+		if err := c.CipherSuites.Validate(); err != nil {
+			return fmt.Errorf("invalid cipher suites (%w)", err)
+		}
 	}
 
 	return c.validateClientCert()
