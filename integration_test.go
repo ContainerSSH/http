@@ -11,12 +11,12 @@ import (
 	"fmt"
 	"math/big"
 	"net"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/containerssh/log"
 	"github.com/containerssh/service"
+	"github.com/containerssh/structutils"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/containerssh/http"
@@ -55,17 +55,11 @@ func (s *handler) OnRequest(request http.ServerRequest, response http.ServerResp
 }
 
 func TestUnencrypted(t *testing.T) {
-	clientConfig := http.ClientConfiguration{
-		URL:     "http://127.0.0.1:8080/",
-		Timeout: 2 * time.Second,
-	}
-	serverConfig := http.ServerConfiguration{
-		Listen: "127.0.0.1:8080",
-	}
+	clientConfig, serverConfig := createClientServerConfig()
 
 	message := "Hi"
 
-	response, responseStatus, err := runRequest(clientConfig, serverConfig, message)
+	response, responseStatus, err := runRequest(clientConfig, serverConfig, t, message)
 	if err != nil {
 		assert.Fail(t, "failed to run request", err)
 		return
@@ -75,19 +69,24 @@ func TestUnencrypted(t *testing.T) {
 	assert.Equal(t, "Hello world!", response.Message)
 }
 
+func createClientServerConfig() (http.ClientConfiguration, http.ServerConfiguration) {
+	clientConfig := http.ClientConfiguration{}
+	serverConfig := http.ServerConfiguration{}
+	structutils.Defaults(&clientConfig)
+	structutils.Defaults(&serverConfig)
+	clientConfig.URL = "http://127.0.0.1:8080/"
+	serverConfig.Listen = "127.0.0.1:8080"
+	return clientConfig, serverConfig
+}
+
 func TestUnencryptedFailure(t *testing.T) {
-	clientConfig := http.ClientConfiguration{
-		URL:     "http://127.0.0.1:8080/",
-		Timeout: 2 * time.Second,
-	}
-	serverConfig := http.ServerConfiguration{
-		Listen: "127.0.0.1:8080",
-	}
+	clientConfig, serverConfig := createClientServerConfig()
 
 	message := "Hm..."
 
-	response, responseStatus, err := runRequest(clientConfig, serverConfig, message)
+	response, responseStatus, err := runRequest(clientConfig, serverConfig, t, message)
 	if err != nil {
+
 		assert.Fail(t, "failed to run request", err)
 		return
 	}
@@ -112,20 +111,15 @@ func TestEncrypted(t *testing.T) {
 		return
 	}
 
-	clientConfig := http.ClientConfiguration{
-		URL:     "https://127.0.0.1:8080/",
-		Timeout: 2 * time.Second,
-		CACert:  string(caCertBytes),
-	}
-	serverConfig := http.ServerConfiguration{
-		Listen: "127.0.0.1:8080",
-		Key:    string(serverPrivKey),
-		Cert:   string(serverCert),
-	}
+	clientConfig, serverConfig := createClientServerConfig()
+	clientConfig.URL = "https://127.0.0.1:8080"
+	clientConfig.CACert = string(caCertBytes)
+	serverConfig.Key = string(serverPrivKey)
+	serverConfig.Cert = string(serverCert)
 
 	message := "Hi"
 
-	response, responseStatus, err := runRequest(clientConfig, serverConfig, message)
+	response, responseStatus, err := runRequest(clientConfig, serverConfig, t, message)
 	if err != nil {
 		assert.Fail(t, "failed to run request", err)
 		return
@@ -166,23 +160,18 @@ func TestMutuallyAuthenticated(t *testing.T) {
 		return
 	}
 
-	clientConfig := http.ClientConfiguration{
-		URL:        "https://127.0.0.1:8080/",
-		CACert:     string(caCertBytes),
-		Timeout:    2 * time.Second,
-		ClientCert: string(clientCert),
-		ClientKey:  string(clientPrivKey),
-	}
-	serverConfig := http.ServerConfiguration{
-		Listen:       "127.0.0.1:8080",
-		Key:          string(serverPrivKey),
-		Cert:         string(serverCert),
-		ClientCACert: string(clientCaCertBytes),
-	}
+	clientConfig, serverConfig := createClientServerConfig()
+	clientConfig.URL = "https://127.0.0.1:8080"
+	clientConfig.CACert = string(caCertBytes)
+	clientConfig.ClientCert = string(clientCert)
+	clientConfig.ClientKey = string(clientPrivKey)
+	serverConfig.Key = string(serverPrivKey)
+	serverConfig.Cert = string(serverCert)
+	serverConfig.ClientCACert = string(clientCaCertBytes)
 
 	message := "Hi"
 
-	response, responseStatus, err := runRequest(clientConfig, serverConfig, message)
+	response, responseStatus, err := runRequest(clientConfig, serverConfig, t, message)
 	if err != nil {
 		assert.Fail(t, "failed to run request", err)
 		return
@@ -223,24 +212,19 @@ func TestMutuallyAuthenticatedFailure(t *testing.T) {
 		return
 	}
 
-	clientConfig := http.ClientConfiguration{
-		URL:        "https://127.0.0.1:8080/",
-		CACert:     string(caCertBytes),
-		Timeout:    2 * time.Second,
-		ClientCert: string(clientCert),
-		ClientKey:  string(clientPrivKey),
-	}
-	serverConfig := http.ServerConfiguration{
-		Listen: "127.0.0.1:8080",
-		Key:    string(serverPrivKey),
-		Cert:   string(serverCert),
-		//Pass wrong client CA cert to test failure
-		ClientCACert: string(caCertBytes),
-	}
+	clientConfig, serverConfig := createClientServerConfig()
+	clientConfig.URL = "https://127.0.0.1:8080"
+	clientConfig.CACert = string(caCertBytes)
+	clientConfig.ClientCert = string(clientCert)
+	clientConfig.ClientKey = string(clientPrivKey)
+	serverConfig.Key = string(serverPrivKey)
+	serverConfig.Cert = string(serverCert)
+	//Pass wrong client CA cert to test failure
+	serverConfig.ClientCACert = string(caCertBytes)
 
 	message := "Hi"
 
-	if _, _, err = runRequest(clientConfig, serverConfig, message); err == nil {
+	if _, _, err = runRequest(clientConfig, serverConfig, t, message); err == nil {
 		assert.Fail(t, "Client request with invalid CA verification did not fail.")
 		return
 	}
@@ -333,23 +317,14 @@ func createSignedCert(
 func runRequest(
 	clientConfig http.ClientConfiguration,
 	serverConfig http.ServerConfiguration,
+	t *testing.T,
 	message string,
 ) (Response, int, error) {
 	response := Response{}
-	logger, err := log.New(
-		log.Config{
-			Level:  log.LevelDebug,
-			Format: log.FormatText,
-		},
-		"http",
-		os.Stdout,
-	)
-	if err != nil {
-		return response, 0, err
-	}
+	logger := log.NewTestLogger(t)
 	client, err := http.NewClient(clientConfig, logger)
 	if err != nil {
-		return response, 0, err
+		return response, 0, fmt.Errorf("failed to create client (%w)", err)
 	}
 
 	ready := make(chan bool, 1)
@@ -360,7 +335,7 @@ func runRequest(
 		logger,
 	)
 	if err != nil {
-		return response, 0, err
+		return response, 0, fmt.Errorf("failed to create server (%w)", err)
 	}
 	lifecycle := service.NewLifecycle(server)
 	lifecycle.OnRunning(func(s service.Service, l service.Lifecycle) {

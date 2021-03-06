@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.6: Configurable TLS support, unified logging
+
+This release adds configurable TLS versions, ciphers, ECDH curves, as well as transitioning to the unified logging interface. 
+
 ## 0.9.5: Added config validation
 
 This release adds a `Validate()` method to both the client and the server configuration. This will allow for a central validation of the entire configuration structure.
