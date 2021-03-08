@@ -10,6 +10,7 @@ import (
 )
 
 // ServerConfiguration is a structure to configure the simple HTTP server by.
+//goland:noinspection GoVetStructTag
 type ServerConfiguration struct {
 	// Listen contains the IP and port to listen on.
 	Listen string `json:"listen" yaml:"listen" default:"0.0.0.0:8080"`
@@ -22,9 +23,9 @@ type ServerConfiguration struct {
 	ClientCACert string `json:"clientcacert" yaml:"clientcacert"`
 
 	// cert is for internal use only. It contains the key and certificate after Validate.
-	cert *tls.Certificate
+	cert *tls.Certificate `json:"-" yaml:"-"`
 	// clientCAPool is for internal use only. It contains the client CA pool after Validate.
-	clientCAPool *x509.CertPool
+	clientCAPool *x509.CertPool `json:"-" yaml:"-"`
 }
 
 // Validate validates the server configuration.
