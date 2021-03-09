@@ -309,7 +309,7 @@ type ClientConfiguration struct {
 	ECDHCurves ECDHCurveList `json:"curves" yaml:"curves" default:"[\"x25519\",\"secp256r1\",\"secp384r1\",\"secp521r1\"]"`
 
 	// CipherSuites is a list of supported cipher suites.
-	CipherSuites CipherSuiteList `json:"cipher" yaml:"cipher" default:"[\"TLS_AES_128_GCM_SHA256\",\"TLS_AES_256_GCM_SHA384\",\"TLS_CHACHA20_POLY1305_SHA256\"]"`
+	CipherSuites CipherSuiteList `json:"cipher" yaml:"cipher" default:"[\"TLS_AES_128_GCM_SHA256\",\"TLS_AES_256_GCM_SHA384\",\"TLS_CHACHA20_POLY1305_SHA256\",\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"]"`
 
 	// caCertPool is for internal use only. It contains the loaded CA certificates after Validate.
 	caCertPool *x509.CertPool `json:"-" yaml:"-"`
@@ -416,7 +416,7 @@ type ServerConfiguration struct {
 	ECDHCurves ECDHCurveList `json:"curves" yaml:"curves" default:"[\"x25519\",\"secp256r1\",\"secp384r1\",\"secp521r1\"]"`
 
 	// CipherSuites is a list of supported cipher suites.
-	CipherSuites CipherSuiteList `json:"cipher" yaml:"cipher" default:"[\"TLS_AES_128_GCM_SHA256\",\"TLS_AES_256_GCM_SHA384\",\"TLS_CHACHA20_POLY1305_SHA256\"]"`
+	CipherSuites CipherSuiteList `json:"cipher" yaml:"cipher" default:"[\"TLS_AES_128_GCM_SHA256\",\"TLS_AES_256_GCM_SHA384\",\"TLS_CHACHA20_POLY1305_SHA256\",\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"]"`
 
 	// cert is for internal use only. It contains the key and certificate after Validate.
 	cert *tls.Certificate `json:"-" yaml:"-"`
