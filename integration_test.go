@@ -333,6 +333,9 @@ func runRequest(
 		serverConfig,
 		http.NewServerHandler(&handler{}, logger),
 		logger,
+		func(_ string) {
+
+		},
 	)
 	if err != nil {
 		return response, 0, fmt.Errorf("failed to create server (%w)", err)
@@ -356,7 +359,8 @@ func runRequest(
 		&Request{Message: message},
 		&response,
 	); err != nil {
-		errorChannel <- err
+		lifecycle.Stop(context.Background())
+		return response, 0, err
 	}
 	lifecycle.Stop(context.Background())
 	if err, ok := <-errorChannel; ok {

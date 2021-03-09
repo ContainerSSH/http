@@ -57,23 +57,23 @@ func (h *handler) ServeHTTP(goWriter goHttp.ResponseWriter, goRequest *goHttp.Re
 		if errors.Is(err, &badRequestResponse) {
 			response = badRequestResponse
 		} else {
-			h.logger.Warningf("handler returned error response (%w)", err)
 			response = internalErrorResponse
 		}
 	}
 	bytes, err := json.Marshal(response.body)
 	if err != nil {
-		h.logger.Errorf("failed to marshal response %v (%w)", response, err)
+		h.logger.Error(log.Wrap(err, MServerEncodeFailed, "failed to marshal response %v", response))
 		response = internalErrorResponse
 		bytes, err = json.Marshal(internalErrorResponse.body)
 		if err != nil {
+			// This should never happen
 			panic(fmt.Errorf("bug: failed to marshal internal server error JSON response (%w)", err))
 		}
 	}
 	goWriter.WriteHeader(int(response.statusCode))
 	goWriter.Header().Add("Content-Type", "application/json")
 	if _, err := goWriter.Write(bytes); err != nil {
-		h.logger.Infof("failed to write HTTP response (%v)", err)
+		h.logger.Debug(log.Wrap(err, MServerResponseWriteFailed, "Failed to write HTTP response"))
 	}
 }
 

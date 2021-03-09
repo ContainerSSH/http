@@ -21,6 +21,7 @@ type server struct {
 	tlsConfig *tls.Config
 	srv       *goHttp.Server
 	goLogger  io.Writer
+	onReady   func(string)
 }
 
 func (s *server) String() string {
@@ -51,6 +52,13 @@ func (s *server) RunWithLifecycle(lifecycle service.Lifecycle) error {
 		return err
 	}
 	defer func() { _ = ln.Close() }()
+	var url string
+	if s.srv.TLSConfig != nil {
+		url = fmt.Sprintf("https://%s", s.config.Listen)
+	} else {
+		url = fmt.Sprintf("http://%s", s.config.Listen)
+	}
+	s.onReady(url)
 	lifecycle.Running()
 	s.lock.Unlock()
 	serverFinished := make(chan struct{}, 1)

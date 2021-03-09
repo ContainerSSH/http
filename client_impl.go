@@ -56,7 +56,7 @@ func (c *client) request(
 		if errors.As(err, &typedError) {
 			return 0, err
 		}
-		err = log.Wrap(err, EFailureConnectionFailed, "HTTP request failed")
+		err = log.Wrap(err, EFailureConnectionFailed, "HTTP %s request to %s%s failed", method, c.config.URL, path)
 		logger.Debug(err)
 		return 0, err
 	}
@@ -71,7 +71,9 @@ func (c *client) request(
 	decoder := json.NewDecoder(resp.Body)
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(responseBody); err != nil {
-		return resp.StatusCode, log.Wrap(err, EFailureDecodeFailed, "Failed to decode HTTP response")
+		err = log.Wrap(err, EFailureDecodeFailed, "Failed to decode HTTP response")
+		logger.Debug(err)
+		return resp.StatusCode, err
 	}
 	return resp.StatusCode, nil
 }

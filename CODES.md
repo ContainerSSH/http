@@ -9,4 +9,6 @@
 | `HTTP_CLIENT_REDIRECTS_DISABLED` | This message indicates that ContainerSSH is not following a HTTP redirect sent by the server. Use the allowRedirects option to allow following HTTP redirects. |
 | `HTTP_CLIENT_REQUEST` | This message indicates that a HTTP request is being sent from ContainerSSH |
 | `HTTP_CLIENT_RESPONSE` | This message indicates that ContainerSSH received a HTTP response from a server. |
+| `HTTP_SERVER_ENCODE_FAILED` | The HTTP server failed to encode the response object. This is a bug, please report it. |
+| `HTTP_SERVER_RESPONSE_WRITE_FAILED` | The HTTP server failed to write the response. |
 

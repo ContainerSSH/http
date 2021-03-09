@@ -22,3 +22,9 @@ const MClientRedirect = "HTTP_CLIENT_REDIRECT"
 
 // This message indicates that ContainerSSH received a HTTP response from a server.
 const MClientResponse = "HTTP_CLIENT_RESPONSE"
+
+// The HTTP server failed to write the response.
+const MServerResponseWriteFailed = "HTTP_SERVER_RESPONSE_WRITE_FAILED"
+
+// The HTTP server failed to encode the response object. This is a bug, please report it.
+const MServerEncodeFailed = "HTTP_SERVER_ENCODE_FAILED"

@@ -80,6 +80,9 @@ server, err := http.NewServer(
     },
     handler,
     logger,
+    func (url string) {
+        fmt.Printf("Server is now ready at %s", url)
+    }
 )
 if err != nil {
     // Handle configuration error

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.9.9: Added onReady hook, TLS settings
+
+Added the onReady hook to allow implementing services to directly inject ready handlers. Also added configurable server TLS settings.
+
 ## 0.9.8: Message code cleanup
 
 This release cleans up the message codes being emitted.
