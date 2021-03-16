@@ -34,7 +34,7 @@ type handler struct {
 
 var internalErrorResponse = serverResponse{
 	500,
-	map[string]string{"error": "Internal Server NewMessage"},
+	map[string]string{"error": "Internal Server Error"},
 }
 
 var badRequestResponse = serverResponse{
