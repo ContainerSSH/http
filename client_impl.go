@@ -101,6 +101,7 @@ func (c *client) createRequest(method string, path string, requestBody interface
 		return nil, err
 	}
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Accept", "application/json")
 	return req, nil
 }
 
