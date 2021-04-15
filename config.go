@@ -311,6 +311,9 @@ type ClientConfiguration struct {
 	// CipherSuites is a list of supported cipher suites.
 	CipherSuites CipherSuiteList `json:"cipher" yaml:"cipher" default:"[\"TLS_AES_128_GCM_SHA256\",\"TLS_AES_256_GCM_SHA384\",\"TLS_CHACHA20_POLY1305_SHA256\",\"TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256\",\"TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256\"]"`
 
+	// RequestEncoding is the means by which the request body is encoded. It defaults to JSON encoding.
+	RequestEncoding RequestEncoding `json:"-" yaml:"-"`
+
 	// caCertPool is for internal use only. It contains the loaded CA certificates after Validate.
 	caCertPool *x509.CertPool `json:"-" yaml:"-"`
 
@@ -330,6 +333,10 @@ func (c *ClientConfiguration) Validate() error {
 	}
 
 	if err := c.validateCACert(); err != nil {
+		return err
+	}
+
+	if err := c.RequestEncoding.Validate(); err != nil {
 		return err
 	}
 
@@ -479,4 +486,30 @@ func (config *ServerConfiguration) Validate() error {
 	}
 
 	return nil
+}
+
+// RequestEncoding is the method by which the response is encoded.
+type RequestEncoding string
+
+// RequestEncodingJSON is the default encoding and encodes the body to JSON.
+const RequestEncodingDefault = ""
+
+// RequestEncodingJSON encodes the body to JSON.
+const RequestEncodingJSON = "JSON"
+
+// RequestEncodingWWURLEncoded encodes the body via www-urlencoded.
+const RequestEncodingWWWURLEncoded = "WWW-URLENCODED"
+
+// Validate validates the RequestEncoding
+func (r RequestEncoding) Validate() error {
+	switch r {
+	case RequestEncodingDefault:
+		return nil
+	case RequestEncodingJSON:
+		return nil
+	case RequestEncodingWWWURLEncoded:
+		return nil
+	default:
+		return fmt.Errorf("invalid request encoding: %s", r)
+	}
 }

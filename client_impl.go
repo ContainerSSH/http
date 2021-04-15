@@ -6,15 +6,36 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
+	"net/url"
 
 	"github.com/containerssh/log"
+	"github.com/gorilla/schema"
 )
 
 type client struct {
 	config    ClientConfiguration
 	logger    log.Logger
 	tlsConfig *tls.Config
+}
+
+func (c *client) Request(Method string, path string, requestBody interface{}, responseBody interface{}) (statusCode int, err error) {
+	return c.request(
+		Method,
+		path,
+		requestBody,
+		responseBody,
+	)
+}
+
+func (c *client) Get(path string, responseBody interface{}) (statusCode int, err error) {
+	return c.request(
+		http.MethodGet,
+		path,
+		nil,
+		responseBody,
+	)
 }
 
 func (c *client) Post(
@@ -68,7 +89,14 @@ func (c *client) request(
 		resp.StatusCode,
 	).Label("statusCode", resp.StatusCode))
 
-	decoder := json.NewDecoder(resp.Body)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		err = log.Wrap(err, EFailureConnectionFailed, "HTTP %s request to %s%s failed", method, c.config.URL, path)
+		logger.Debug(err)
+		return 0, err
+	}
+
+	decoder := json.NewDecoder(bytes.NewReader(body))
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(responseBody); err != nil {
 		err = log.Wrap(err, EFailureDecodeFailed, "Failed to decode HTTP response")
@@ -83,12 +111,28 @@ func (c *client) createRequest(method string, path string, requestBody interface
 	error,
 ) {
 	buffer := &bytes.Buffer{}
-	err := json.NewEncoder(buffer).Encode(requestBody)
-	if err != nil {
-		//This is a bug
-		err := log.Wrap(err, EFailureEncodeFailed, "BUG: HTTP request encoding failed")
-		logger.Debug(err)
-		return nil, err
+	switch c.config.RequestEncoding {
+	case RequestEncodingDefault:
+		fallthrough
+	case RequestEncodingJSON:
+		err := json.NewEncoder(buffer).Encode(requestBody)
+		if err != nil {
+			//This is a bug
+			err := log.Wrap(err, EFailureEncodeFailed, "BUG: HTTP request encoding failed")
+			logger.Critical(err)
+			return nil, err
+		}
+	case RequestEncodingWWWURLEncoded:
+		encoder := schema.NewEncoder()
+		form := url.Values{}
+		if err := encoder.Encode(requestBody, form); err != nil {
+			err := log.Wrap(err, EFailureEncodeFailed, "BUG: HTTP request encoding failed")
+			logger.Critical(err)
+			return nil, err
+		}
+		buffer.WriteString(form.Encode())
+	default:
+		panic(fmt.Errorf("invalid request encoding: %s", c.config.RequestEncoding))
 	}
 	req, err := http.NewRequest(
 		method,
@@ -97,10 +141,19 @@ func (c *client) createRequest(method string, path string, requestBody interface
 	)
 	if err != nil {
 		err := log.Wrap(err, EFailureEncodeFailed, "BUG: HTTP request encoding failed")
-		logger.Debug(err)
+		logger.Critical(err)
 		return nil, err
 	}
-	req.Header.Set("Content-Type", "application/json")
+	switch c.config.RequestEncoding {
+	case RequestEncodingDefault:
+		fallthrough
+	case RequestEncodingJSON:
+		req.Header.Set("Content-Type", "application/json")
+	case RequestEncodingWWWURLEncoded:
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	default:
+		panic(fmt.Errorf("invalid request encoding: %s", c.config.RequestEncoding))
+	}
 	req.Header.Set("Accept", "application/json")
 	return req, nil
 }

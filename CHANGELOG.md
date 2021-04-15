@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.2: Adding support for www-urlencoded request body
+
+This release adds the ability to switch request bodies to the `www-urlencoded` encoding for the purposes of OAuth2 authentication.
+
 ## 1.0.1: Explicitly setting the `Accept` header
 
 This release explicitly adds the "Accept" header on client requests.

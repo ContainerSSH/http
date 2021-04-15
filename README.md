@@ -30,6 +30,8 @@ clientConfig := http.ClientConfiguration{
     // Optionally, for client authentication:
     ClientCert: "Client certificate in PEM format or file name",
     ClientKey:  "Client key in PEM format or file name",
+    // Optional: switch to www-urlencoded request body
+    RequestEncoding: http.RequestEncodingWWWURLEncoded,
 }
 client, err := http.NewClient(clientConfig, logger)
 if err != nil {
