@@ -24,4 +24,28 @@ type Client interface {
 		requestBody interface{},
 		responseBody interface{},
 	) (statusCode int, err error)
+
+	// Put queries the configured endpoint with the path, sending the requestBody and providing the
+	// response in the responseBody structure. It returns the HTTP status code and any potential errors.
+	Put(
+		path string,
+		requestBody interface{},
+		responseBody interface{},
+	) (statusCode int, err error)
+
+	// Patch queries the configured endpoint with the path, sending the requestBody and providing the
+	// response in the responseBody structure. It returns the HTTP status code and any potential errors.
+	Patch(
+		path string,
+		requestBody interface{},
+		responseBody interface{},
+	) (statusCode int, err error)
+
+	// Delete queries the configured endpoint with the path, sending the requestBody and providing the
+	// response in the responseBody structure. It returns the HTTP status code and any potential errors.
+	Delete(
+		path string,
+		requestBody interface{},
+		responseBody interface{},
+	) (statusCode int, err error)
 }

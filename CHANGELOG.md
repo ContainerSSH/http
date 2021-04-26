@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.1.0: Adding support for additional HTTP methods
+
+This release adds support for the Delete, Put, and Patch methods.
+
 ## 1.0.2: Adding support for www-urlencoded request body
 
 This release adds the ability to switch request bodies to the `www-urlencoded` encoding for the purposes of OAuth2 authentication.

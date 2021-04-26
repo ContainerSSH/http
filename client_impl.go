@@ -20,6 +20,45 @@ type client struct {
 	tlsConfig *tls.Config
 }
 
+func (c *client) Put(
+	path string,
+	requestBody interface{},
+	responseBody interface{},
+) (statusCode int, err error) {
+	return c.request(
+		http.MethodPut,
+		path,
+		requestBody,
+		responseBody,
+	)
+}
+
+func (c *client) Patch(
+	path string,
+	requestBody interface{},
+	responseBody interface{},
+) (statusCode int, err error) {
+	return c.request(
+		http.MethodPatch,
+		path,
+		requestBody,
+		responseBody,
+	)
+}
+
+func (c *client) Delete(
+	path string,
+	requestBody interface{},
+	responseBody interface{},
+) (statusCode int, err error) {
+	return c.request(
+		http.MethodDelete,
+		path,
+		requestBody,
+		responseBody,
+	)
+}
+
 func (c *client) Request(Method string, path string, requestBody interface{}, responseBody interface{}) (statusCode int, err error) {
 	return c.request(
 		Method,
