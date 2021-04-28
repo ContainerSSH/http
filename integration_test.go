@@ -228,7 +228,6 @@ func TestMutuallyAuthenticatedFailure(t *testing.T) {
 		assert.Fail(t, "Client request with invalid CA verification did not fail.")
 		return
 	}
-	println(err)
 }
 
 func createCA() (*rsa.PrivateKey, *x509.Certificate, []byte, error) {

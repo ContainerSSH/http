@@ -1,5 +1,7 @@
 github.com/containerssh/log v1.0.0 h1:nOSqNqh7cXIa+Iy+Lx2CA+wpkrqDqcQh4EVoEvSaxU8=
 github.com/containerssh/log v1.0.0/go.mod h1:7Gy+sx0H1UDtjYBySvK0CnXRRHPHZPXMsa9MYmLBI0I=
+github.com/containerssh/log v1.1.0 h1:7xJyBrvFU9BIMEttCfmVkJHg6K8tLxevLZ/hxLiM7Co=
+github.com/containerssh/log v1.1.0/go.mod h1:7Gy+sx0H1UDtjYBySvK0CnXRRHPHZPXMsa9MYmLBI0I=
 github.com/containerssh/service v1.0.0 h1:+AcBsmeaR0iMDnemXJ6OgeTEYB3C0YJF3h03MNIo1Ak=
 github.com/containerssh/service v1.0.0/go.mod h1:FmYg3jc56WBvxyx5rvXCkJbIsmweNTeYSr/9z2n2qsI=
 github.com/containerssh/structutils v1.0.0 h1:XwNSnjmoJpMP8hxX5YbDJRGcU66znRWP5jKUYI2Kh4s=
