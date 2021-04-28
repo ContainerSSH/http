@@ -1,9 +1,9 @@
 module github.com/containerssh/http
 
-go 1.14
+go 1.16
 
 require (
-	github.com/containerssh/log v1.1.0
+	github.com/containerssh/log v1.1.1
 	github.com/containerssh/service v1.0.0
 	github.com/containerssh/structutils v1.0.0
 	github.com/gorilla/schema v1.2.0
