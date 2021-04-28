@@ -1,0 +1,113 @@
+name: QA
+on:
+  push:
+  pull_request:
+  schedule:
+    - cron: '0 17 * * 2'
+jobs:
+  fmt:
+    name: gofmt
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'schedule' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - name: Run gofmt
+        run: ./.github/scripts/gofmt.sh
+  vet:
+    name: go vet
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'schedule' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: go-vet-${{ hashFiles('**/go.sum') }}
+          restore-keys: go-vet-
+      - name: Run go vet
+        run: ./.github/scripts/govet.sh
+  golangci-lint:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name != 'schedule' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.32.2
+          args: --timeout=5m -E asciicheck -E bodyclose -E dupl -E errorlint -E exportloopref -E funlen
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: go
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v1
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+  test:
+    name: go test
+    if: ${{ github.event_name != 'schedule' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: go-test-${{ hashFiles('**/go.sum') }}
+          restore-keys: go-test-
+      - name: Run go test
+        run: ./.github/scripts/gotest.sh
+  lint:
+    name: Run lint
+    needs:
+      - fmt
+      - vet
+      - golangci-lint
+      - codeql
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print success
+        run: |
+          echo ""
+          echo "⚙️ Note: this step is provided for compatibility with required checks. Please check the individual linting steps for details."
+          echo -e "\e[0;32m✅ All linting rules passed.\e[0m"
+  tests:
+    name: Run tests
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print success
+        run: |
+          echo ""
+          echo "⚙️ Note: this step is provided for compatibility with required checks. Please check the individual test steps for details."
+          echo -e "\e[0;32m✅ All tests passed.\e[0m"
