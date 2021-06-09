@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.2.0: Support for content negotiation
+
+This release adds support for creating a handler that performs content negotiation between JSON and text output.
+
 ## 1.1.0: Adding support for additional HTTP methods
 
 This release adds support for the Delete, Put, and Patch methods.

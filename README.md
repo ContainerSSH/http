@@ -162,6 +162,16 @@ func (c *myController) OnRequest(request http.ServerRequest, response http.Serve
 
 In other words, the `ServerRequest` object gives you the ability to decode the request into a struct of your choice. The `ServerResponse`, conversely, encodes a struct into the the response body and provides the ability to enter a status code.
 
+## Content negotiation
+
+If you wish to perform content negotiation on the server side, this library now supports switching between text and JSON output. This can be invoked using the `NewServerHandlerNegotiate` method instead of `NewServerHandler`. This handler will attempt to switch based on the `Accept` header sent by the client. You can marshal objects to text by implementing the following interface:
+
+```go
+type TextMarshallable interface {
+	MarshalText() string
+}
+```
+
 ## Using multiple handlers
 
 This is a very simple handler example. You can use utility like [gorilla/mux](https://github.com/gorilla/mux) as an intermediate handler between the simplified handler and the server itself.
