@@ -15,9 +15,11 @@ import (
 )
 
 type client struct {
-	config    ClientConfiguration
-	logger    log.Logger
-	tlsConfig *tls.Config
+	config           ClientConfiguration
+	logger           log.Logger
+	tlsConfig        *tls.Config
+	extraHeaders     map[string][]string
+	allowLaxDecoding bool
 }
 
 func (c *client) Put(
@@ -135,8 +137,13 @@ func (c *client) request(
 		return 0, err
 	}
 
+	if responseBody == nil {
+		return resp.StatusCode, nil
+	}
 	decoder := json.NewDecoder(bytes.NewReader(body))
-	decoder.DisallowUnknownFields()
+	if !c.allowLaxDecoding {
+		decoder.DisallowUnknownFields()
+	}
 	if err := decoder.Decode(responseBody); err != nil {
 		err = log.Wrap(err, EFailureDecodeFailed, "Failed to decode HTTP response")
 		logger.Debug(err)
@@ -182,6 +189,15 @@ func (c *client) createRequest(method string, path string, requestBody interface
 		err := log.Wrap(err, EFailureEncodeFailed, "BUG: HTTP request encoding failed")
 		logger.Critical(err)
 		return nil, err
+	}
+	for header, values := range c.extraHeaders {
+		for i, value := range values {
+			if i == 0 {
+				req.Header.Set(header, value)
+			} else {
+				req.Header.Add(header, value)
+			}
+		}
 	}
 	switch c.config.RequestEncoding {
 	case RequestEncodingDefault:
