@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.3.0: Support for extra headers
+
+This release adds support for injecting extra headers.
+
 ## 1.2.0: Support for content negotiation
 
 This release adds support for creating a handler that performs content negotiation between JSON and text output.
