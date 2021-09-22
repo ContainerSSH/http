@@ -5,7 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	net "net"
+	"net"
 	"net/url"
 	"strings"
 	"time"

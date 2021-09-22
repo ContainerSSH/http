@@ -12,6 +12,16 @@ func NewClient(
 	config ClientConfiguration,
 	logger log.Logger,
 ) (Client, error) {
+	return NewClientWithHeaders(config, logger, nil, false)
+}
+
+// NewClientWithHeaders creates a new HTTP client with added extra headers.
+func NewClientWithHeaders(
+	config ClientConfiguration,
+	logger log.Logger,
+	extraHeaders map[string][]string,
+	allowLaxDecoding bool,
+) (Client, error) {
 	if err := config.Validate(); err != nil {
 		return nil, err
 	}
@@ -28,6 +38,8 @@ func NewClient(
 		config:    config,
 		logger:    logger.WithLabel("endpoint", config.URL),
 		tlsConfig: tlsConfig,
+		extraHeaders: extraHeaders,
+		allowLaxDecoding: allowLaxDecoding,
 	}, nil
 }
 
